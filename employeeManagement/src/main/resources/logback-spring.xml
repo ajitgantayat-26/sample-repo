@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Console Appender for local debugging -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logstash Appender to send logs via TCP -->
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- Dynamically reads LOGSTASH_HOST from docker-compose, default to localhost -->
+        <destination>logstash:5044</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <!-- Global Root Logger -->
+    <root level="INFO">
+        <!-- Always log to the console so you can see errors -->
+        <appender-ref ref="CONSOLE" />
+
+        <!-- Only stream logs to Logstash if the 'prod' profile is turned on -->
+        <springProfile name="prod">
+            <appender-ref ref="LOGSTASH" />
+        </springProfile>
+    </root>
+</configuration>
